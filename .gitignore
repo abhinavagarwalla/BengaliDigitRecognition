@@ -2,3 +2,5 @@
 *.png
 *.jpg
 *.zip
+*.o
+*.out
