@@ -67,7 +67,7 @@ int main(int argc, char **argv){
 	cv::namedWindow("image",0);
 	//cv::imshow("image",orig);
 	//cv::waitKey(0);
-	cv::Mat origp = padding(orig,3); 
+	cv::Mat origp = padding(orig,5); 
 
 	int window=9;
 	int k=0.34*200.0;
