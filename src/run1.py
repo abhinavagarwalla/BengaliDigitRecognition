@@ -16,7 +16,7 @@ from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
-from keras.optimizers import SGD
+from keras.optimizers import SGD,Adam
 from keras.utils import np_utils
 from sklearn.cross_validation import train_test_split
 import numpy as np
@@ -24,7 +24,7 @@ import pandas as pd
 
 batch_size = 32
 nb_classes = 10
-nb_epoch = 200
+nb_epoch = 100
 data_augmentation = True
 
 # input image dimensions
@@ -77,9 +77,9 @@ model.add(Dense(nb_classes,init='glorot_uniform'))
 model.add(Activation('softmax'))
 
 # let's train the model using SGD + momentum (how original).
-sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
 model.compile(loss='categorical_crossentropy',
-              optimizer=sgd,
+              optimizer=adam,
               metrics=['accuracy'])
 
 X_train = X_train.astype('float32')
@@ -104,7 +104,7 @@ else:
         featurewise_std_normalization=False,  # divide inputs by std of the dataset
         samplewise_std_normalization=False,  # divide each input by its std
         zca_whitening=False,  # apply ZCA whitening
-        rotation_range=0,  # randomly rotate images in the range (degrees, 0 to 180)
+        rotation_range=10,  # randomly rotate images in the range (degrees, 0 to 180)
         width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
         height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
         horizontal_flip=True,  # randomly flip images
