@@ -16,7 +16,7 @@ from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
-from keras.optimizers import SGD,Adam
+from keras.optimizers import SGD,Adam,Nadam
 from keras.utils import np_utils
 from sklearn.cross_validation import train_test_split
 import numpy as np
@@ -43,7 +43,7 @@ def load_data():
 
 # the data, shuffled and split between tran and test sets
 (X, Y) = load_data()
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42, stratify=Y)
 print 'X_train shape:', X_train.shape
 print X_train.shape[0], 'train samples'
 print X_test.shape[0], 'test samples'
@@ -77,9 +77,11 @@ model.add(Dense(nb_classes,init='glorot_uniform'))
 model.add(Activation('softmax'))
 
 # let's train the model using SGD + momentum (how original).
+sgd = SGD(lr=0.01, momentum=0.0, decay=0.0, nesterov=False)
 adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+nadam = Nadam(lr=0.002, beta_1=0.9, beta_2=0.999, epsilon=1e-08, schedule_decay=0.004)
 model.compile(loss='categorical_crossentropy',
-              optimizer=adam,
+              optimizer=nadam,
               metrics=['accuracy'])
 
 X_train = X_train.astype('float32')
@@ -94,6 +96,7 @@ if not data_augmentation:
               nb_epoch=nb_epoch,
               validation_data=(X_test, Y_test),
               shuffle=True)
+    model.save_weights('../results/run1_weights')
 else:
     print('Using real-time data augmentation.')
 
