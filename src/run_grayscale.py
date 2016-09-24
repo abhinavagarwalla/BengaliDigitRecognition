@@ -33,12 +33,12 @@ data_augmentation = True
 # input image dimensions
 img_rows, img_cols = 32, 32
 # the CIFAR10 images are RGB
-img_channels = 3
+img_channels = 1
 
 def load_data():
     f = open('../preprocessing/images_list.txt').readlines()
     #print np.asarray(PIL.Image.open("../data/images/"+f[i].strip()))
-    X = [img_to_array(load_img("../data/images_resized_32/"+f[i].strip())) for i in range(len(f))]
+    X = [img_to_array(load_img("../data/images_gray_32/"+f[i].strip())) for i in range(len(f))]
     X = np.asarray(X).reshape(-1,3,32,32)
     #print f.shape
     Y = pd.read_csv('../data/labels.csv')   
@@ -140,7 +140,4 @@ for train, test in folds:
         y_pred = model.predict_classes(x_test)
         # print y_pred
         print accuracy_score(y_test, y_pred), precision_score(y_test, y_pred, average='micro'), recall_score(y_test, y_pred, average='micro'), f1_score(y_test, y_pred, average='micro')
-        model.save_weights('../results/run2_'+'cv_'+str(jc) + '_weights')
 
-with open('../results/run2_arch.txt','w') as outfile:
-    json.dump(model.to_json(), outfile)
