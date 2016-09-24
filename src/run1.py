@@ -21,6 +21,8 @@ from keras.utils import np_utils
 from sklearn.cross_validation import train_test_split
 import numpy as np
 import pandas as pd
+import json
+import random
 
 batch_size = 32
 nb_classes = 10
@@ -43,7 +45,7 @@ def load_data():
 
 # the data, shuffled and split between tran and test sets
 (X, Y) = load_data()
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=42, stratify=Y)
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=random.randint(10,1000), stratify=Y)
 print 'X_train shape:', X_train.shape
 print X_train.shape[0], 'train samples'
 print X_test.shape[0], 'test samples'
@@ -97,6 +99,7 @@ if not data_augmentation:
               validation_data=(X_test, Y_test),
               shuffle=True)
     model.save_weights('../results/run1_weights')
+    model.to_json('../results/run1_arch')
 else:
     print('Using real-time data augmentation.')
 
@@ -122,4 +125,7 @@ else:
                         batch_size=batch_size),
                         samples_per_epoch=X_train.shape[0],
                         nb_epoch=nb_epoch,
-                        validation_data=(X_test, Y_test))
+                        validation_data=(X_test, Y_test), verbose=2)
+    model.save_weights('../results/run1_weights')
+    with open('../results/run1_arch.txt','w') as outfile:
+	json.dump(model.to_json(), outfile)
