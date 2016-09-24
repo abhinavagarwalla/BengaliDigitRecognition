@@ -22,7 +22,11 @@ cv::Mat rgb2gray(cv::Mat img){
 
 int main(int argc, char **argv){
 	cv::Mat orig1=cv::imread(argv[1],1);
-	cv::Mat orig=rgb2gray(orig1);
+	cv::Mat orig ;
+	orig=rgb2gray(orig1);
+	
+	cvtColor(orig1, orig, CV_BGR2GRAY);
+
 	cv::namedWindow("image",0);
 
 
