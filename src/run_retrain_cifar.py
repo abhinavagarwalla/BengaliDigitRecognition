@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 import json
 import random
+from data_model import load_data, simple_model
 
 batch_size = 32
 nb_classes = 10
@@ -35,21 +36,12 @@ img_rows, img_cols = 32, 32
 # the CIFAR10 images are RGB
 img_channels = 3
 
-def load_data():
-    f = open('../preprocessing/images_list.txt').readlines()
-    #print np.asarray(PIL.Image.open("../data/images/"+f[i].strip()))
-    X = [img_to_array(load_img("../data/images_resized_32/"+f[i].strip())) for i in range(len(f))]
-    X = np.asarray(X).reshape(-1,3,32,32)
-    #print f.shape
-    Y = pd.read_csv('../data/labels.csv')   
-    return (X,Y["Label"].tolist())
+# images are RGB
+img_channels = 3
+img_size = 32
+random.seed(1729)
 
-# the data, shuffled and split between tran and test sets
-(X, Y) = load_data()
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=random.randint(10,1000), stratify=Y)
-print 'X_train shape:', X_train.shape
-print X_train.shape[0], 'train samples'
-print X_test.shape[0], 'test samples'
+X_train, X_test, Y_train, Y_test = load_data(img_size)
 
 folds = StratifiedKFold(Y_train, n_folds=4, shuffle=True)
 

@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 import json
 import random
+from data_model import load_data
 
 nb_classes = 10
 
@@ -28,27 +29,10 @@ nb_classes = 10
 img_rows, img_cols = 32, 32
 # the CIFAR10 images are RGB
 img_channels = 3
+img_size = 32
 
-def load_data():
-    f = open('../preprocessing/images_list.txt').readlines()
-    #print np.asarray(PIL.Image.open("../data/images/"+f[i].strip()))
-    X = [img_to_array(load_img("../data/images_resized_32/"+f[i].strip())) for i in range(len(f))]
-    X = np.asarray(X).reshape(-1,3,32,32)
-    #print f.shape
-    Y = pd.read_csv('../data/labels.csv')   
-    return (X,Y["Label"].tolist())
+X_train, X_test, Y_train, Y_test = load_data(img_size)
 
-# the data, shuffled and split between tran and test sets
-(X, Y) = load_data()
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=1729, stratify=Y)
-print 'X_train shape:', X_train.shape
-print X_train.shape[0], 'train samples'
-print X_test.shape[0], 'test samples'
-
-# convert class vectors to binary class matrices
-# Y_train = np_utils.to_categorical(Y_train, nb_classes)
-# Y_test = np_utils.to_categorical(Y_test, nb_classes)
-# print Y_train
 Y_train = np.array(Y_train)
 X_train = X_train.astype('float32')
 X_test = X_test.astype('float32')
@@ -57,7 +41,7 @@ X_test /= 255
 
 for i in range(1,5):
     model = model_from_json(json.loads(open('../results/run_prelu_arch.txt').read()))
-    model.load_weights("../results/prelu_best_weights"+"_cv_"+str(i)+".hdf5")
+    model.load_weights("../results/prelu_customcb_weights"+"_cv_"+str(i)+".hdf5")
     
     print "Test Accuracy: "
     Y_pred = model.predict_classes(X_test)
