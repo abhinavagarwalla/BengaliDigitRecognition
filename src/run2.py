@@ -125,7 +125,11 @@ for train, test in folds:
             width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
             height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
             horizontal_flip=True,  # randomly flip images
-            vertical_flip=False)  # randomly flip images
+            vertical_flip=False,
+            shear_range=0.,
+            zoom_range=0.,
+            channel_shift_range=0.,
+            rescale=None)  # randomly flip images
 
         # compute quantities required for featurewise normalization
         # (std, mean, and principal components if ZCA whitening is applied)
@@ -138,7 +142,6 @@ for train, test in folds:
                             nb_epoch=nb_epoch,
                             verbose=0)
         y_pred = model.predict_classes(x_test)
-        # print y_pred
         print accuracy_score(y_test, y_pred), precision_score(y_test, y_pred, average='micro'), recall_score(y_test, y_pred, average='micro'), f1_score(y_test, y_pred, average='micro')
         model.save_weights('../results/run2_'+'cv_'+str(jc) + '_weights')
 

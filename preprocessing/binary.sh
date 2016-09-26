@@ -6,5 +6,5 @@ while read -r line
 do
 	#convert ../data/images_resized_"$size"/"$line" -monochrome -density 300 ../data/images_binary_"$size"/"$line"
 	#convert ../data/images/"$line" -monochrome -density 300 ../data/images_binary/"$line"
-	./a.out ../data/images_resized_"$size"/"$line" ../data/images_otsu_"$size"/"$line"
+	./otsu ../data/images_resized_"$size"/"$line" ../data/images_otsu_"$size"/"$line"
 done < "$filename"

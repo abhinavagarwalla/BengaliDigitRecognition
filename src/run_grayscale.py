@@ -38,7 +38,7 @@ img_channels = 1
 def load_data():
     f = open('../preprocessing/images_list.txt').readlines()
     #print np.asarray(PIL.Image.open("../data/images/"+f[i].strip()))
-    X = [img_to_array(load_img("../data/images_gray_32/"+f[i].strip())) for i in range(len(f))]
+    X = [img_to_array(load_img("../data/images_otsu_32/"+f[i].strip())) for i in range(len(f))]
     X = np.asarray(X).reshape(-1,3,32,32)
     #print f.shape
     Y = pd.read_csv('../data/labels.csv')   
