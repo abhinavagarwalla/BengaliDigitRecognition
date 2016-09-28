@@ -24,6 +24,7 @@ import pandas as pd
 import json
 import random
 from data_model import load_data, simple_model
+import torchfile
 
 batch_size = 32
 nb_classes = 10
@@ -35,7 +36,14 @@ img_channels = 3
 img_size = 32
 random.seed(1729)
 
-X_train, X_test, Y_train, Y_test = load_data(img_size)
+#X_train, X_test, Y_train, Y_test = load_data(img_size)
+data = torchfile.load('../wrn/provider.t7')
+#print data
+#print data["trainData"].shape, data["testData"]
+X_train = data["trainData"]["data"]
+Y_train = data["trainData"]["labels"]
+X_test = data["testData"]["data"]
+Y_test = data["testData"]["labels"]
 
 # convert class vectors to binary class matrices
 Y_train = np_utils.to_categorical(Y_train, nb_classes)
@@ -43,13 +51,11 @@ Y_test = np_utils.to_categorical(Y_test, nb_classes)
 
 img_dim = X_train.shape[1:]
 model = simple_model(img_dim, nb_classes)
-print model.summary()
-exit(9)
 
 X_train = X_train.astype('float32')
 X_test = X_test.astype('float32')
-X_train /= 255
-X_test /= 255
+#X_train /= 255
+#X_test /= 255
 
 if not data_augmentation:
     print('Not using data augmentation.')
@@ -58,8 +64,6 @@ if not data_augmentation:
               nb_epoch=nb_epoch,
               validation_data=(X_test, Y_test),
               shuffle=True)
-    model.save_weights('../results/run1_weights')
-    model.to_json('../results/run1_arch')
 else:
     print('Using real-time data augmentation.')
 
@@ -86,6 +90,6 @@ else:
                         samples_per_epoch=X_train.shape[0],
                         nb_epoch=nb_epoch,
                         validation_data=(X_test, Y_test), verbose=2)
-    model.save_weights('../results/run1_weights')
-    with open('../results/run1_arch.txt','w') as outfile:
+    model.save_weights('../results/run_provider_weights')
+    with open('../results/run_provider_arch.txt','w') as outfile:
 	json.dump(model.to_json(), outfile)

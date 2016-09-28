@@ -180,6 +180,107 @@ model.fit(X_train, Y_train, batch_size=32, nb_epoch=25,
 
 print("Test classification rate %0.05f" % model.evaluate(X_test, Y_test, show_accuracy=True)[1])
 
+# IV, OverFeat Adaptation of AlexNet
+
+model = Sequential()
+
+# Layer 1
+model.add(Convolution2D(96, 11, 11, input_shape = (1,28,28), border_mode='same'))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Layer 2
+model.add(Convolution2D(256, 5, 5, border_mode='same'))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Layer 3
+model.add(ZeroPadding2D((1,1)))
+model.add(Convolution2D(512, 3, 3, border_mode='same'))
+model.add(Activation('relu'))
+
+# Layer 4
+model.add(ZeroPadding2D((1,1)))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Activation('relu'))
+
+# Layer 5
+model.add(ZeroPadding2D((1,1)))
+model.add(Convolution2D(1024, 3, 3, border_mode='same'))
+model.add(Activation('relu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+
+# Layer 6
+model.add(Flatten())
+model.add(Dense(3072, init='glorot_normal'))
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
+
+# Layer 7
+model.add(Dense(4096, init='glorot_normal'))
+model.add(Activation('relu'))
+model.add(Dropout(0.5))
+
+# Layer 8
+model.add(Dense(10, init='glorot_normal'))
+model.add(Activation('softmax'))
+
+model.compile(loss='categorical_crossentropy', optimizer=RMSprop())
+model.fit(X_train[:10], Y_train[:10], batch_size=1, nb_epoch=1,
+          verbose=1, show_accuracy=True)
+
+# V. GoogleNet Model
+model = Graph()
+model.add_input(name='n00', input_shape=(1,28,28))
+
+# layer 1
+model.add_node(Convolution2D(64,1,1, activation='relu'), name='n11', input='n00')
+model.add_node(Flatten(), name='n11_f', input='n11')
+
+model.add_node(Convolution2D(96,1,1, activation='relu'), name='n12', input='n00')
+
+model.add_node(Convolution2D(16,1,1, activation='relu'), name='n13', input='n00')
+
+model.add_node(MaxPooling2D((3,3),strides=(2,2)), name='n14', input='n00')
+
+# layer 2
+model.add_node(Convolution2D(128,3,3, activation='relu'), name='n22', input='n12')
+model.add_node(Flatten(), name='n22_f', input='n22')
+
+model.add_node(Convolution2D(32,5,5, activation='relu'), name='n23', input='n13')
+model.add_node(Flatten(), name='n23_f', input='n23')
+
+model.add_node(Convolution2D(32,1,1, activation='relu'), name='n24', input='n14')
+model.add_node(Flatten(), name='n24_f', input='n24')
+
+# output layer
+model.add_node(Dense(1024, activation='relu'), name='layer4',
+               inputs=['n11_f', 'n22_f', 'n23_f', 'n24_f'], merge_mode='concat')
+model.add_node(Dense(10, activation='softmax'), name='layer5', input='layer4')
+model.add_output(name='output1',input='layer5')
+
+model.compile(loss={'output1':'categorical_crossentropy'}, optimizer=RMSprop())
+model.fit({'n00':X_train[:100], 'output1':Y_train[:100]}, nb_epoch=1, verbose=1)
+
+
+## VI. residual Nets 
+model = Graph()
+model.add_input(name='input0', input_shape=(1,28,28))
+model.add_node(Flatten(), name='input1', input='input0')
+model.add_node(Dense(50),   name='input2', input='input1')
+
+model.add_node(Dense(50, activation='relu'), name='middle1', input='input2')
+model.add_node(Dense(50, activation='relu'), name='middle2', input='middle1')
+
+model.add_node(Dense(512, activation='relu'), name='top1',
+               inputs=['input2', 'middle2'], merge_mode='sum')
+model.add_node(Dense(10, activation='softmax'), name='top2', input='top1')
+model.add_output(name='top3',input='top2')
+
+model.compile(loss={'top3':'categorical_crossentropy'}, optimizer=RMSprop())
+model.fit({'input0':X_train, 'top3':Y_train}, nb_epoch=25, verbose=1,
+          validation_data={'input0':X_test, 'top3':Y_test})
+
 
 # ### III. Pure convolution
 # For reference, here is the architecture of a Pure Convolution network: Springenberg, J. T., Dosovitskiy, A., Brox, T., & Riedmiller, M. (2014). Striving for simplicity: The all convolutional net. arXiv preprint arXiv:1412.6806. 
@@ -208,9 +309,3 @@ model.add(Activation('softmax'))
           
 rms = RMSprop()
 model.compile(loss='categorical_crossentropy', optimizer=rms)
-
-
-# In[ ]:
-
-
-
